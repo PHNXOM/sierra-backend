@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface MessageRepository extends JpaRepository<Message, UUID> {
     @Query("FROM Message WHERE (sender.id = :userId1 AND receiver.id = :userId2) " +
             "OR (sender.id = :userId2 AND receiver.id = :userId1) " +
-            "ORDER BY sentAt ASC")
+            "ORDER BY sentAt DESC")
     List<Message> getMessagesBetweenTwoUsers(@Param("userId1") UUID userId1, @Param("userId2") UUID userId2);
 
 

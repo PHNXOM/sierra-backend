@@ -21,6 +21,7 @@ public class SocketController {
 
     @MessageMapping("/typing")
     public void handleTypingEvent(@Payload TypingEventRequest typingEventRequest) {
+
         String senderId = typingEventRequest.getSenderId();
         String receiverId = typingEventRequest.getReceiverId();
 

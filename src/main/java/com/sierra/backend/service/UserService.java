@@ -7,6 +7,10 @@ import com.sierra.backend.exception.ServerException;
 import com.sierra.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +29,14 @@ public class UserService {
         this.messageService = messageService;
     }
 
-
-
+    @Cacheable(value = "users", key = "#id")
     public User findById(UUID id) {
         Optional<User> result = userRepository.findById(id);
         return result.orElse(null);
 
     }
 
+    @Cacheable(value = "usernames", key = "#username")
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -45,11 +49,19 @@ public class UserService {
 
 
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "usernames", key = "#result.username"),
+            @CachePut(value = "users", key = "#result.id")
+    })
     public User save(User user) {
         return userRepository.save(user);
     }
 
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "usernames", key = "#result.username"),
+            @CachePut(value = "users", key = "#result.id")
+    })
     public User updateUser(UUID userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ServerException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -69,6 +81,10 @@ public class UserService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "usernames", key = "#user.username"),
+            @CacheEvict(value = "users", key = "#user.id")
+    })
     public void deleteUser(User user) {
         UUID userId = user.getId();
 
@@ -81,6 +97,10 @@ public class UserService {
 
 
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "usernames", key = "#result.username"),
+            @CachePut(value = "users", key = "#result.id")
+    })
     public void addPushToken(UUID userId, PushTokenRequest pushTokenRequest) {
         if(pushTokenRequest.getPushToken() == null) return;
 
@@ -96,6 +116,10 @@ public class UserService {
     }
 
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "usernames", key = "#result.username"),
+            @CachePut(value = "users", key = "#result.id")
+    })
     public void deletePushTokens(UUID userId, PushTokenRequest pushTokenRequest) {
         if(pushTokenRequest.getPushToken() == null) return;
 

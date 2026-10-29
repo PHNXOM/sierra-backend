@@ -143,15 +143,15 @@ public class MessageService {
 
     public void emitDeleteChat(UUID userId1, UUID userId2) {
         SocketEventResponse payload1 = new SocketEventResponse("DELETE_CHAT", Map.of(
-                "receiverId", userId2
+                "otherUserId", userId2
         ));
 
         SocketEventResponse payload2 = new SocketEventResponse("DELETE_CHAT", Map.of(
-                "receiverId", userId1
+                "otherUserId", userId1
         ));
 
-        simpMessagingTemplate.convertAndSend("/queue/events/" + userId2, payload1);
-        simpMessagingTemplate.convertAndSend("/queue/events/" + userId1, payload2);
+        simpMessagingTemplate.convertAndSend("/queue/events/" + userId1, payload1);
+        simpMessagingTemplate.convertAndSend("/queue/events/" + userId2, payload2);
     }
 
     // PUSH NOTIFICATION
